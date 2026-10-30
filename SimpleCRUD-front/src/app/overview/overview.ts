@@ -1,23 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
+import { SimpleEntityService } from '../simple-entity-service';
+import { Observable } from 'rxjs';
 
 export interface SimpleEntity {
   id: number;
   name: string;
 }
-
-const DATA: SimpleEntity[] = [
-  { id: 1, name: 'Hydrogen' },
-  { id: 2, name: 'Helium' },
-  { id: 3, name: 'Lithium' },
-  { id: 4, name: 'Beryllium' },
-  { id: 5, name: 'Boron' },
-  { id: 6, name: 'Carbon' },
-  { id: 7, name: 'Nitrogen' },
-  { id: 8, name: 'Oxygen' },
-  { id: 9, name: 'Fluorine' },
-  { id: 10, name: 'Neon' },
-];
 
 @Component({
   imports: [MatTableModule],
@@ -27,6 +16,13 @@ const DATA: SimpleEntity[] = [
 })
 export class Overview {
   displayedColumns: string[] = ['id', 'name'];
-  dataSource = DATA;
+  dataSource!: Observable<SimpleEntity[]>;
   trackById = (_: number, entity: SimpleEntity): number => entity.id;
+
+  private simpleEntityService = inject(SimpleEntityService);
+  constructor() {
+    effect(() => {
+      this.dataSource = this.simpleEntityService.Get();
+    });
+  }
 }
